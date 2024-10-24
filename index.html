@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu de Correspondance de Verbes Français</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .words, .definitions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .box {
+            padding: 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .color1 {
+            background-color: #d4edda; /* Light green */
+        }
+        .color2 {
+            background-color: #ffeeba; /* Light yellow */
+        }
+        .color3 {
+            background-color: #c3e6cb; /* Light pink */
+        }
+        .selected {
+            border-color: #007bff;
+        }
+        .disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Associez les verbes français avec leurs définitions</h1>
+    <div class="container">
+        <div class="words"></div>
+        <br>
+        <div class="definitions"></div>
+        <br>
+        <button onclick="checkAnswers()">Vérifier les réponses</button>
+        <p id="result"></p>
+        <p id="score"></p>
+    </div>
+
+    <script>
+        const verbs = [
+            { word: "Manger", definition: "Consommer de la nourriture" },
+            { word: "Dormir", definition: "Se reposer en fermant les yeux" },
+            { word: "Écrire", definition: "Rédiger un texte avec un stylo ou un clavier" },
+            { word: "Lire", definition: "Décoder un texte" },
+            { word: "Marcher", definition: "Se déplacer à pied" },
+            { word: "Courir", definition: "Se déplacer rapidement avec les pieds" },
+            { word: "Parler", definition: "Communiquer oralement" },
+            { word: "Boire", definition: "Ingesting a liquid" },
+            { word: "Apprendre", definition: "Acquérir des connaissances" },
+            { word: "Voir", definition: "Percevoir avec les yeux" },
+    { word: "Manger", definition: "Consommer de la nourriture" },
+    { word: "Dormir", definition: "Se reposer en fermant les yeux" },
+    { word: "Écrire", definition: "Rédiger un texte avec un stylo ou un clavier" },
+    { word: "Lire", definition: "Décoder un texte" },
+    { word: "Marcher", definition: "Se déplacer à pied" },
+    { word: "Courir", definition: "Se déplacer rapidement avec les pieds" },
+    { word: "Parler", definition: "Communiquer oralement" },
+    { word: "Boire", definition: "Ingesting a liquid" },
+    { word: "Apprendre", definition: "Acquérir des connaissances" },
+    { word: "Voir", definition: "Percevoir avec les yeux" },
+    { word: "Conduire", definition: "Diriger un véhicule" },
+    { word: "Étudier", definition: "Apprendre des informations ou des compétences" },
+    { word: "Jouer", definition: "Participer à une activité récréative" },
+    { word: "Aimer", definition: "Éprouver de l'affection ou de l'attirance" },
+    { word: "Habiter", definition: "Résider dans un lieu" },
+    { word: "Rire", definition: "Exprimer du bonheur avec un son" },
+    { word: "Nager", definition: "Se déplacer dans l'eau en utilisant les bras et les jambes" },
+    { word: "Danser", definition: "Bouger le corps en suivant un rythme" },
+    { word: "Chanter", definition: "Produire des sons musicaux avec la voix" },
+    { word: "Écouter", definition: "Faire attention à ce qu'on entend" },
+    { word: "Attendre", definition: "Rester en un lieu jusqu'à un événement" },
+    { word: "Travailler", definition: "Accomplir une tâche ou un emploi" },
+    { word: "Voyager", definition: "Se déplacer d'un endroit à un autre, souvent sur une longue distance" },
+    { word: "Cuisiner", definition: "Préparer de la nourriture" },
+    { word: "Nettoyer", definition: "Enlever la saleté ou les impuretés" },
+    { word: "Acheter", definition: "Obtenir quelque chose en échange d'argent" },
+    { word: "Vendre", definition: "Céder un bien contre de l'argent" },
+    { word: "Ouvrir", definition: "Faire que quelque chose ne soit plus fermé" },
+    { word: "Fermer", definition: "Rendre quelque chose inaccessible en le verrouillant" },
+    { word: "Monter", definition: "Aller vers le haut" },
+    { word: "Descendre", definition: "Aller vers le bas" },
+    { word: "Payer", definition: "Donner de l'argent en échange d'un service ou produit" },
+    { word: "Recevoir", definition: "Obtenir quelque chose qui est donné" },
+    { word: "Envoyer", definition: "Faire parvenir quelque chose à quelqu'un" },
+    { word: "Commencer", definition: "Initier quelque chose" },
+    { word: "Finir", definition: "Mettre un terme à quelque chose" },
+    { word: "Apporter", definition: "Transporter quelque chose à un endroit spécifique" },
+    { word: "Chercher", definition: "Tenter de trouver quelque chose" },
+    { word: "Trouver", definition: "Découvrir quelque chose que l'on cherchait" },
+    { word: "Prier", definition: "S'adresser à une divinité ou pratiquer une dévotion" },
+    { word: "Décider", definition: "Prendre une décision après réflexion" },
+    { word: "Répondre", definition: "Donner une réponse à une question ou à un appel" },
+    { word: "Demander", definition: "Poser une question ou solliciter quelque chose" },
+    { word: "Oublier", definition: "Ne pas se souvenir de quelque chose" },
+    { word: "Rencontrer", definition: "Faire la connaissance de quelqu'un ou croiser une personne" },
+    { word: "Se lever", definition: "Passer d'une position assise ou couchée à debout" },
+    { word: "Se coucher", definition: "Aller au lit ou s'allonger pour dormir" },
+    { word: "Penser", definition: "Formuler des idées dans son esprit" },
+    { word: "Espérer", definition: "Attendre quelque chose de positif avec anticipation" },
+    { word: "Comprendre", definition: "Saisir le sens ou la signification de quelque chose" },
+    { word: "Douter", definition: "Ne pas être certain de quelque chose" },
+    { word: "Réfléchir", definition: "Penser profondément à un sujet ou une question" },
+    { word: "Garder", definition: "Conserver quelque chose en sa possession" },
+    { word: "Cacher", definition: "Mettre quelque chose à l'abri des regards" },
+    { word: "Changer", definition: "Modifier quelque chose ou passer à une autre situation" },
+    { word: "Sourire", definition: "Exprimer la joie ou l'amusement par un mouvement des lèvres" },
+    { word: "Détester", definition: "Ressentir de l'aversion pour quelque chose ou quelqu'un" },
+    { word: "Plaire", definition: "Susciter du plaisir ou de l'agrément à quelqu'un" },
+    { word: "Vivre", definition: "Être en vie ou habiter dans un endroit" },
+    { word: "Tomber", definition: "Perdre l'équilibre et s'effondrer vers le sol" },
+    { word: "Entrer", definition: "Passer de l'extérieur vers l'intérieur d'un lieu" },
+    { word: "Sortir", definition: "Passer de l'intérieur vers l'extérieur" },
+    { word: "Arriver", definition: "Atteindre un lieu après un déplacement" },
+    { word: "Partir", definition: "Quitter un endroit" },
+    { word: "Réussir", definition: "Atteindre un objectif ou accomplir quelque chose avec succès" },
+    { word: "Échouer", definition: "Ne pas réussir ou ne pas atteindre un objectif" },
+    { word: "Accepter", definition: "Consentir à recevoir quelque chose" },
+    { word: "Accompagner", definition: "Aller avec quelqu'un quelque part" },
+    { word: "Ajouter", definition: "Incorporer quelque chose en plus" },
+    { word: "Amener", definition: "Conduire ou guider quelqu'un à un endroit" },
+    { word: "Annoncer", definition: "Faire savoir quelque chose publiquement" },
+    { word: "Appartenir", definition: "Être la propriété de quelqu'un" },
+    { word: "Appeler", definition: "Contacter quelqu'un par téléphone" },
+    { word: "Arrêter", definition: "Mettre fin à une action ou un mouvement" },
+    { word: "Assister", definition: "Être présent à un événement" },
+    { word: "Attraper", definition: "Saisir quelque chose qui est en mouvement" },
+    { word: "Bâtir", definition: "Construire un édifice ou une structure" },
+    { word: "Casser", definition: "Briser ou endommager quelque chose" },
+    { word: "Charger", definition: "Mettre une charge ou remplir quelque chose" },
+    { word: "Choisir", definition: "Sélectionner parmi plusieurs options" },
+    { word: "Commander", definition: "Passer une demande pour un produit ou un service" },
+    { word: "Compter", definition: "Déterminer le nombre d'éléments" },
+    { word: "Connaître", definition: "Avoir des informations sur quelqu'un ou quelque chose" },
+    { word: "Continuer", definition: "Poursuivre une action ou un processus" },
+    { word: "Couvrir", definition: "Placer quelque chose sur un autre objet pour le protéger" },
+    { word: "Décrire", definition: "Donner des détails sur quelque chose ou quelqu'un" },
+    { word: "Développer", definition: "Faire progresser ou améliorer quelque chose" },
+    { word: "Discuter", definition: "Échanger des idées ou des opinions" },
+    { word: "Doubler", definition: "Faire deux fois une action ou dépasser quelque chose" },
+    { word: "Économiser", definition: "Mettre de l'argent de côté ou réduire les dépenses" },
+    { word: "Élever", definition: "Faire grandir un enfant ou augmenter quelque chose" },
+    { word: "Enseigner", definition: "Transmettre des connaissances ou des compétences" },
+    { word: "Expliquer", definition: "Rendre quelque chose compréhensible" },
+    { word: "Gagner", definition: "Obtenir la victoire ou un avantage" },
+      { word: "Aimer", definition: "Éprouver de l'affection ou de l'attirance" },
+    { word: "Habiter", definition: "Résider dans un lieu" },
+    { word: "Rire", definition: "Exprimer du bonheur avec un son" },
+    { word: "Nager", definition: "Se déplacer dans l'eau en utilisant les bras et les jambes" },
+    { word: "Danser", definition: "Bouger le corps en suivant un rythme" },
+    { word: "Chanter", definition: "Produire des sons musicaux avec la voix" },
+    { word: "Écouter", definition: "Faire attention à ce qu'on entend" },
+    { word: "Attendre", definition: "Rester en un lieu jusqu'à un événement" },
+    { word: "Travailler", definition: "Accomplir une tâche ou un emploi" },
+    { word: "Voyager", definition: "Se déplacer d'un endroit à un autre, souvent sur une longue distance" },
+    { word: "Cuisiner", definition: "Préparer de la nourriture" },
+    { word: "Nettoyer", definition: "Enlever la saleté ou les impuretés" },
+    { word: "Acheter", definition: "Obtenir quelque chose en échange d'argent" },
+    { word: "Vendre", definition: "Céder un bien contre de l'argent" },
+    { word: "Ouvrir", definition: "Faire que quelque chose ne soit plus fermé" },
+    { word: "Fermer", definition: "Rendre quelque chose inaccessible en le verrouillant" },
+    { word: "Monter", definition: "Aller vers le haut" },
+    { word: "Descendre", definition: "Aller vers le bas" },
+    { word: "Payer", definition: "Donner de l'argent en échange d'un service ou produit" },
+    { word: "Recevoir", definition: "Obtenir quelque chose qui est donné" },
+    { word: "Envoyer", definition: "Faire parvenir quelque chose à quelqu'un" },
+    { word: "Commencer", definition: "Initier quelque chose" },
+    { word: "Finir", definition: "Mettre un terme à quelque chose" },
+    { word: "Apporter", definition: "Transporter quelque chose à un endroit spécifique" },
+    { word: "Chercher", definition: "Tenter de trouver quelque chose" },
+    { word: "Trouver", definition: "Découvrir quelque chose que l'on cherchait" },
+    { word: "Prier", definition: "S'adresser à une divinité ou pratiquer une dévotion" },
+    { word: "Décider", definition: "Prendre une décision après réflexion" },
+    { word: "Répondre", definition: "Donner une réponse à une question ou à un appel" },
+    { word: "Demander", definition: "Poser une question ou solliciter quelque chose" },
+    { word: "Oublier", definition: "Ne pas se souvenir de quelque chose" },
+    { word: "Rencontrer", definition: "Faire la connaissance de quelqu'un ou croiser une personne" },
+    { word: "Se lever", definition: "Passer d'une position assise ou couchée à debout" },
+    { word: "Se coucher", definition: "Aller au lit ou s'allonger pour dormir" },
+    { word: "Penser", definition: "Formuler des idées dans son esprit" },
+    { word: "Espérer", definition: "Attendre quelque chose de positif avec anticipation" },
+    { word: "Comprendre", definition: "Saisir le sens ou la signification de quelque chose" },
+    { word: "Douter", definition: "Ne pas être certain de quelque chose" },
+    { word: "Réfléchir", definition: "Penser profondément à un sujet ou une question" },
+    { word: "Garder", definition: "Conserver quelque chose en sa possession" },
+    { word: "Cacher", definition: "Mettre quelque chose à l'abri des regards" },
+    { word: "Changer", definition: "Modifier quelque chose ou passer à une autre situation" },
+    { word: "Sourire", definition: "Exprimer la joie ou l'amusement par un mouvement des lèvres" },
+    { word: "Détester", definition: "Ressentir de l'aversion pour quelque chose ou quelqu'un" },
+    { word: "Plaire", definition: "Susciter du plaisir ou de l'agrément à quelqu'un" },
+    { word: "Vivre", definition: "Être en vie ou habiter dans un endroit" },
+    { word: "Tomber", definition: "Perdre l'équilibre et s'effondrer vers le sol" },
+    { word: "Entrer", definition: "Passer de l'extérieur vers l'intérieur d'un lieu" },
+    { word: "Sortir", definition: "Passer de l'intérieur vers l'extérieur" },
+    { word: "Arriver", definition: "Atteindre un lieu après un déplacement" },
+    { word: "Partir", definition: "Quitter un endroit" },
+    { word: "Réussir", definition: "Atteindre un objectif ou accomplir quelque chose avec succès" },
+    { word: "Échouer", definition: "Ne pas réussir ou ne pas atteindre un objectif" },
+    { word: "Manger", definition: "Consommer de la nourriture" },
+    { word: "Dormir", definition: "Se reposer en fermant les yeux" },
+    { word: "Écrire", definition: "Rédiger un texte avec un stylo ou un clavier" },
+    { word: "Lire", definition: "Décoder un texte" },
+    { word: "Marcher", definition: "Se déplacer à pied" },
+    { word: "Courir", definition: "Se déplacer rapidement avec les pieds" },
+    { word: "Parler", definition: "Communiquer oralement" },
+    { word: "Boire", definition: "Ingesting a liquid" },
+    { word: "Apprendre", definition: "Acquérir des connaissances" },
+    { word: "Voir", definition: "Percevoir avec les yeux" },
+    { word: "Conduire", definition: "Diriger un véhicule" },
+    { word: "Étudier", definition: "Apprendre des informations ou des compétences" },
+    { word: "Jouer", definition: "Participer à une activité récréative" },
+    { word: "Aimer", definition: "Éprouver de l'affection ou de l'attirance" },
+    { word: "Habiter", definition: "Résider dans un lieu" },
+    { word: "Rire", definition: "Exprimer du bonheur avec un son" },
+    { word: "Nager", definition: "Se déplacer dans l'eau en utilisant les bras et les jambes" },
+    { word: "Danser", definition: "Bouger le corps en suivant un rythme" },
+    { word: "Chanter", definition: "Produire des sons musicaux avec la voix" },
+    { word: "Écouter", definition: "Faire attention à ce qu'on entend" },
+    { word: "Attendre", definition: "Rester en un lieu jusqu'à un événement" },
+    { word: "Travailler", definition: "Accomplir une tâche ou un emploi" },
+    { word: "Voyager", definition: "Se déplacer d'un endroit à un autre, souvent sur une longue distance" },
+    { word: "Cuisiner", definition: "Préparer de la nourriture" },
+    { word: "Nettoyer", definition: "Enlever la saleté ou les impuretés" },
+    { word: "Acheter", definition: "Obtenir quelque chose en échange d'argent" },
+    { word: "Vendre", definition: "Céder un bien contre de l'argent" },
+    { word: "Ouvrir", definition: "Faire que quelque chose ne soit plus fermé" },
+    { word: "Fermer", definition: "Rendre quelque chose inaccessible en le verrouillant" },
+    { word: "Monter", definition: "Aller vers le haut" },
+    { word: "Descendre", definition: "Aller vers le bas" },
+    { word: "Payer", definition: "Donner de l'argent en échange d'un service ou produit" },
+    { word: "Recevoir", definition: "Obtenir quelque chose qui est donné" },
+    { word: "Envoyer", definition: "Faire parvenir quelque chose à quelqu'un" },
+    { word: "Commencer", definition: "Initier quelque chose" },
+    { word: "Finir", definition: "Mettre un terme à quelque chose" },
+    { word: "Apporter", definition: "Transporter quelque chose à un endroit spécifique" },
+    { word: "Chercher", definition: "Tenter de trouver quelque chose" },
+    { word: "Trouver", definition: "Découvrir quelque chose que l'on cherchait" },
+    { word: "Prier", definition: "S'adresser à une divinité ou pratiquer une dévotion" },
+    { word: "Décider", definition: "Prendre une décision après réflexion" },
+    { word: "Répondre", definition: "Donner une réponse à une question ou à un appel" },
+    { word: "Demander", definition: "Poser une question ou solliciter quelque chose" },
+    { word: "Oublier", definition: "Ne pas se souvenir de quelque chose" },
+    { word: "Rencontrer", definition: "Faire la connaissance de quelqu'un ou croiser une personne" },
+    { word: "Se lever", definition: "Passer d'une position assise ou couchée à debout" },
+    { word: "Se coucher", definition: "Aller au lit ou s'allonger pour dormir" },
+    { word: "Penser", definition: "Formuler des idées dans son esprit" },
+    { word: "Espérer", definition: "Attendre quelque chose de positif avec anticipation" },
+    { word: "Comprendre", definition: "Saisir le sens ou la signification de quelque chose" },
+    { word: "Douter", definition: "Ne pas être certain de quelque chose" },
+    { word: "Réfléchir", definition: "Penser profondément à un sujet ou une question" },
+    { word: "Garder", definition: "Conserver quelque chose en sa possession" },
+    { word: "Cacher", definition: "Mettre quelque chose à l'abri des regards" },
+    { word: "Changer", definition: "Modifier quelque chose ou passer à une autre situation" },
+    { word: "Sourire", definition: "Exprimer la joie ou l'amusement par un mouvement des lèvres" },
+    { word: "Détester", definition: "Ressentir de l'aversion pour quelque chose ou quelqu'un" },
+    { word: "Plaire", definition: "Susciter du plaisir ou de l'agrément à quelqu'un" },
+    { word: "Vivre", definition: "Être en vie ou habiter dans un endroit" },
+    { word: "Tomber", definition: "Perdre l'équilibre et s'effondrer vers le sol" },
+    { word: "Entrer", definition: "Passer de l'extérieur vers l'intérieur d'un lieu" },
+    { word: "Sortir", definition: "Passer de l'intérieur vers l'extérieur" },
+    { word: "Arriver", definition: "Atteindre un lieu après un déplacement" },
+    { word: "Partir", definition: "Quitter un endroit" },
+    { word: "Réussir", definition: "Atteindre un objectif ou accomplir quelque chose avec succès" },
+    { word: "Échouer", definition: "Ne pas réussir ou ne pas atteindre un objectif" },
+    { word: "Accepter", definition: "Consentir à recevoir quelque chose" },
+    { word: "Accompagner", definition: "Aller avec quelqu'un quelque part" },
+    { word: "Ajouter", definition: "Incorporer quelque chose en plus" },
+    { word: "Amener", definition: "Conduire ou guider quelqu'un à un endroit" },
+    { word: "Annoncer", definition: "Faire savoir quelque chose publiquement" },
+    { word: "Appartenir", definition: "Être la propriété de quelqu'un" },
+    { word: "Appeler", definition: "Contacter quelqu'un par téléphone" },
+    { word: "Arrêter", definition: "Mettre fin à une action ou un mouvement" },
+    { word: "Assister", definition: "Être présent à un événement" },
+    { word: "Attraper", definition: "Saisir quelque chose qui est en mouvement" },
+    { word: "Bâtir", definition: "Construire un édifice ou une structure" },
+    { word: "Casser", definition: "Briser ou endommager quelque chose" },
+    { word: "Charger", definition: "Mettre une charge ou remplir quelque chose" },
+    { word: "Choisir", definition: "Sélectionner parmi plusieurs options" },
+    { word: "Commander", definition: "Passer une demande pour un produit ou un service" },
+    { word: "Compter", definition: "Déterminer le nombre d'éléments" },
+    { word: "Connaître", definition: "Avoir des informations sur quelqu'un ou quelque chose" },
+    { word: "Continuer", definition: "Poursuivre une action ou un processus" },
+    { word: "Couvrir", definition: "Placer quelque chose sur un autre objet pour le protéger" },
+    { word: "Décrire", definition: "Donner des détails sur quelque chose ou quelqu'un" },
+    { word: "Développer", definition: "Faire progresser ou améliorer quelque chose" },
+    { word: "Discuter", definition: "Échanger des idées ou des opinions" },
+    { word: "Doubler", definition: "Faire deux fois une action ou dépasser quelque chose" },
+    { word: "Économiser", definition: "Mettre de l'argent de côté ou réduire les dépenses" },
+    { word: "Élever", definition: "Faire grandir un enfant ou augmenter quelque chose" },
+    { word: "Enseigner", definition: "Transmettre des connaissances ou des compétences" },
+    { word: "Expliquer", definition: "Rendre quelque chose compréhensible" },
+    { word: "Gagner", definition: "Obtenir la victoire ou un avantage" },
+        { word: "Abandonner", definition: "Laisser définitivement quelqu'un ou quelque chose" },
+    { word: "Accuser", definition: "Reprocher une faute à quelqu'un" },
+    { word: "Agrandir", definition: "Rendre quelque chose plus grand" },
+    { word: "Améliorer", definition: "Rendre quelque chose meilleur" },
+    { word: "Annuler", definition: "Déclarer invalide ou ne pas poursuivre une action" },
+    { word: "Appuyer", definition: "Exercer une pression sur quelque chose ou soutenir une idée" },
+    { word: "Arranger", definition: "Mettre en ordre ou ajuster quelque chose" },
+    { word: "Assumer", definition: "Prendre la responsabilité de quelque chose" },
+    { word: "Attirer", definition: "Faire venir quelqu'un ou quelque chose vers soi" },
+    { word: "Avouer", definition: "Reconnaître une faute ou un secret" },
+    { word: "Bénir", definition: "Accorder une faveur divine à quelqu'un ou quelque chose" },
+    { word: "Bousculer", definition: "Pousser quelqu'un violemment ou bouleverser l'ordre établi" },
+    { word: "Briller", definition: "Émettre de la lumière ou exceller dans un domaine" },
+    { word: "Brûler", definition: "Dégrader ou consommer par le feu" },
+    { word: "Capituler", definition: "Abandonner la résistance dans un conflit" },
+    { word: "Capturer", definition: "Attraper et retenir quelqu'un ou quelque chose" },
+    { word: "Consoler", definition: "Apporter du réconfort à quelqu'un dans le chagrin" },
+    { word: "Convaincre", definition: "Persuader quelqu'un de la validité d'une opinion" },
+    { word: "Critiquer", definition: "Exprimer une opinion défavorable ou porter un jugement" },
+    { word: "Déclencher", definition: "Provoquer le début d'un événement ou d'une action" },
+    { word: "Dépenser", definition: "Utiliser de l'argent ou de l'énergie" },
+    { word: "Déranger", definition: "Perturber quelqu'un ou troubler l'ordre" },
+    { word: "Diriger", definition: "Être responsable ou guider un groupe ou une organisation" },
+    { word: "Disparaître", definition: "Cesser d'être visible ou d'exister" },
+    { word: "Divulguer", definition: "Révéler une information qui devait rester secrète" },
+    { word: "Éclaircir", definition: "Rendre quelque chose plus clair ou compréhensible" },
+    { word: "Éclater", definition: "Se briser soudainement ou exploser" },
+    { word: "Élire", definition: "Choisir quelqu'un par vote pour une position" },
+    { word: "Empêcher", definition: "Faire obstacle à une action ou un événement" },
+    { word: "Enfreindre", definition: "Ne pas respecter une loi ou une règle" },
+    { word: "Enquêter", definition: "Chercher des informations sur un événement ou une personne" },
+    { word: "Enregistrer", definition: "Capturer des sons ou des images pour les conserver" },
+    { word: "Entretenir", definition: "Maintenir quelque chose en bon état ou s'occuper de quelqu'un" },
+    { word: "Établir", definition: "Mettre en place de manière durable ou officielle" },
+    { word: "Exiger", definition: "Demander quelque chose de manière impérative" },
+    { word: "Explorer", definition: "Examiner attentivement un lieu ou un sujet" },
+    { word: "Exprimer", definition: "Communiquer un sentiment ou une idée" },
+    { word: "Féliciter", definition: "Exprimer des vœux de bonheur ou de réussite à quelqu'un" },
+    { word: "Fuir", definition: "Échapper à un danger ou éviter une situation" },
+    { word: "Gérer", definition: "S'occuper de l'administration ou de la direction d'une activité" },
+    { word: "Inquiéter", definition: "Provoquer de l'angoisse ou du souci chez quelqu'un" },
+    { word: "Murmurer", definition: "Parler à voix très basse" },
+    { word: "Négliger", definition: "Ne pas accorder l'attention nécessaire à quelque chose" },
+    { word: "Nier", definition: "Refuser d'admettre quelque chose" },
+    { word: "Prévenir", definition: "Informer à l'avance ou empêcher un danger" },
+    { word: "Récompenser", definition: "Donner quelque chose en reconnaissance d'un effort ou d'une réussite" },
+    { word: "Remercier", definition: "Exprimer de la gratitude" },
+    { word: "Remplacer", definition: "Prendre la place de quelque chose ou quelqu'un" },
+    { word: "Surmonter", definition: "Réussir à se libérer d'une difficulté" },
+    { word: "Tenter", definition: "Essayer de faire quelque chose, généralement difficile" },
+    { word: "Transmettre", definition: "Faire passer quelque chose d'une personne à une autre" },
+        { word: "Abîmer", definition: "Endommager ou détériorer quelque chose" },
+    { word: "Accéder", definition: "Avoir accès à un lieu ou à une information" },
+    { word: "Achever", definition: "Terminer complètement une tâche ou une action" },
+    { word: "Adapter", definition: "Modifier quelque chose pour qu'il convienne à une situation" },
+    { word: "Adopter", definition: "Prendre légalement en charge un enfant ou choisir quelque chose comme sien" },
+    { word: "Affirmer", definition: "Déclarer quelque chose avec certitude" },
+    { word: "Agrandir", definition: "Rendre quelque chose plus grand ou plus spacieux" },
+    { word: "Amener", definition: "Faire venir quelqu'un ou quelque chose à un endroit" },
+    { word: "Approuver", definition: "Accepter ou donner son accord à quelque chose" },
+    { word: "Arracher", definition: "Enlever brusquement quelque chose de sa position" },
+    { word: "Assister", definition: "Être présent à un événement ou apporter de l'aide" },
+    { word: "Assumer", definition: "Accepter la responsabilité de quelque chose" },
+    { word: "Avertir", definition: "Informer quelqu'un d'un danger ou d'une situation importante" },
+    { word: "Bouger", definition: "Déplacer son corps ou quelque chose d'une position à une autre" },
+    { word: "Brouiller", definition: "Rendre confus ou rendre une information difficile à comprendre" },
+    { word: "Céder", definition: "Donner quelque chose volontairement ou sous pression" },
+    { word: "Clôturer", definition: "Terminer quelque chose, souvent un événement ou une réunion" },
+    { word: "Compliquer", definition: "Rendre quelque chose plus difficile ou confus" },
+    { word: "Confirmer", definition: "Vérifier ou prouver que quelque chose est vrai" },
+    { word: "Constituer", definition: "Former ou créer un ensemble" },
+    { word: "Contrôler", definition: "Surveiller ou diriger quelque chose" },
+    { word: "Coordonner", definition: "Organiser plusieurs éléments pour qu'ils fonctionnent ensemble" },
+    { word: "Corriger", definition: "Rectifier une erreur ou une faute" },
+    { word: "Craindre", definition: "Ressentir de la peur ou de l'inquiétude à propos de quelque chose" },
+    { word: "Débarrasser", definition: "Enlever ou se débarrasser de quelque chose" },
+    { word: "Décourager", definition: "Faire perdre la motivation à quelqu'un" },
+    { word: "Déduire", definition: "Tirer une conclusion à partir d'informations" },
+    { word: "Dépendre", definition: "Être influencé ou contrôlé par quelque chose ou quelqu'un" },
+    { word: "Déplacer", definition: "Changer quelque chose de place" },
+    { word: "Déposer", definition: "Laisser quelque chose quelque part" },
+    { word: "Détenir", definition: "Posséder ou retenir quelque chose" },
+    { word: "Détourner", definition: "Changer la direction de quelque chose" },
+    { word: "Diminuer", definition: "Réduire en quantité, en taille ou en intensité" },
+    { word: "Diriger", definition: "Conduire ou gérer une activité ou un groupe de personnes" },
+    { word: "Dissoudre", definition: "Faire disparaître dans un liquide ou mettre fin à une organisation" },
+    { word: "Diviser", definition: "Séparer quelque chose en plusieurs parties" },
+    { word: "Élaborer", definition: "Développer ou préparer avec soin" },
+    { word: "Éliminer", definition: "Supprimer ou retirer complètement quelque chose" },
+    { word: "Empêcher", definition: "Faire en sorte que quelque chose ne se produise pas" },
+    { word: "Encourager", definition: "Inciter ou donner de la motivation à quelqu'un" },
+    { word: "Éprouver", definition: "Ressentir un sentiment ou une sensation" },
+    { word: "Établir", definition: "Mettre en place ou fonder quelque chose" },
+    { word: "Éviter", definition: "S'efforcer de ne pas rencontrer ou subir quelque chose" },
+    { word: "Exécuter", definition: "Réaliser ou accomplir une action" },
+    { word: "Exiger", definition: "Demander avec insistance ou nécessité" },
+    { word: "Fournir", definition: "Donner ou procurer quelque chose à quelqu'un" },
+    { word: "Garantir", definition: "Assurer la qualité ou la fiabilité de quelque chose" },
+    { word: "Gaspiller", definition: "Utiliser de manière inefficace ou excessive" },
+    { word: "Ignorer", definition: "Ne pas prêter attention à quelque chose ou quelqu'un" },
+    { word: "Impliquer", definition: "Engager quelqu'un dans une situation ou un processus" },
+    { word: "Influencer", definition: "Avoir un effet sur les actions ou les pensées de quelqu'un" },
+        { word: "Accomplir", definition: "Réaliser ou achever une tâche avec succès" },
+    { word: "Accueillir", definition: "Recevoir quelqu'un de manière chaleureuse" },
+    { word: "Accuser", definition: "Reprocher à quelqu'un une faute ou un crime" },
+    { word: "Admettre", definition: "Reconnaître ou accepter quelque chose" },
+    { word: "Apaiser", definition: "Rendre plus calme ou moins intense" },
+    { word: "Appartenir", definition: "Être la propriété de quelqu'un" },
+    { word: "Applaudir", definition: "Exprimer son approbation en battant des mains" },
+    { word: "Approfondir", definition: "Explorer ou étudier plus en détail" },
+    { word: "Arrêter", definition: "Cesser une action ou capturer quelqu'un" },
+    { word: "Assurer", definition: "Garantir ou rendre sûr" },
+    { word: "Attendre", definition: "Rester en un lieu en espérant quelque chose ou quelqu'un" },
+    { word: "Attraper", definition: "Saisir ou capturer quelque chose en mouvement" },
+    { word: "Avancer", definition: "Se déplacer vers l'avant" },
+    { word: "Balayer", definition: "Nettoyer en utilisant un balai" },
+    { word: "Blesser", definition: "Causer une douleur physique ou émotionnelle" },
+    { word: "Briser", definition: "Mettre en morceaux ou détruire" },
+    { word: "Cacher", definition: "Mettre quelque chose hors de vue" },
+    { word: "Calculer", definition: "Effectuer des opérations mathématiques" },
+    { word: "Céder", definition: "Abandonner quelque chose à quelqu'un" },
+    { word: "Chasser", definition: "Poursuivre et tuer un animal ou chercher à capturer" },
+    { word: "Classer", definition: "Organiser par catégories" },
+    { word: "Combattre", definition: "Lutter contre quelque chose ou quelqu'un" },
+    { word: "Commettre", definition: "Faire une faute ou un crime" },
+    { word: "Compléter", definition: "Achever ou rendre quelque chose entier" },
+    { word: "Conclure", definition: "Terminer un discours ou une action" },
+    { word: "Conduire", definition: "Diriger un véhicule ou mener un groupe" },
+    { word: "Confondre", definition: "Mélanger deux choses dans l'esprit ou rendre perplexe" },
+    { word: "Constituer", definition: "Former ou établir un ensemble" },
+    { word: "Consulter", definition: "Demander l'avis ou le conseil de quelqu'un" },
+    { word: "Convaincre", definition: "Persuader quelqu'un d'accepter un point de vue" },
+    { word: "Cueillir", definition: "Ramasser des fruits, des fleurs ou des plantes" },
+    { word: "Défendre", definition: "Protéger contre une attaque ou une critique" },
+    { word: "Déplacer", definition: "Changer la position de quelque chose" },
+    { word: "Développer", definition: "Faire croître ou augmenter en complexité" },
+    { word: "Discuter", definition: "Parler avec quelqu'un pour échanger des idées" },
+    { word: "Distribuer", definition: "Répartir des objets à plusieurs personnes" },
+    { word: "Douter", definition: "Ne pas être sûr de quelque chose" },
+    { word: "Échanger", definition: "Donner quelque chose en contrepartie d'une autre" },
+    { word: "Éclairer", definition: "Projeter de la lumière sur quelque chose" },
+    { word: "Élever", definition: "Augmenter ou éduquer un enfant" },
+    { word: "Éloigner", definition: "Mettre quelque chose ou quelqu'un à une certaine distance" },
+    { word: "Énerver", definition: "Agacer ou irriter quelqu'un" },
+    { word: "Enseigner", definition: "Transmettre des connaissances à quelqu'un" },
+    { word: "Entourer", definition: "Placer quelque chose autour de" },
+    { word: "Éteindre", definition: "Arrêter une source de lumière ou d'énergie" },
+    { word: "Exécuter", definition: "Réaliser une tâche ou appliquer une décision" },
+    { word: "Exprimer", definition: "Communiquer des idées ou des sentiments" },
+    { word: "Fabriquer", definition: "Construire ou produire quelque chose" },
+    { word: "Gagner", definition: "Obtenir une victoire ou recevoir un gain" },
+    { word: "Garantir", definition: "Assurer ou promettre quelque chose" }
+        ];
+
+        let selectedWords = [];
+        let selectedDefs = [];
+        let score = 0;
+        let totalQuestions = 0;
+        let currentPair = 0;
+
+        // Colors for each pair (3 distinct colors)
+        const colors = ['color1', 'color2', 'color3'];
+
+        // Function to shuffle the array
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Function to randomly pick 3 verbs and definitions
+        function loadWordsAndDefs() {
+            // Clear selections
+            selectedWords = [];
+            selectedDefs = [];
+            currentPair = 0;
+            document.getElementById('result').textContent = '';
+
+            // Shuffle and pick 3 random verbs
+            const randomVerbs = shuffle(verbs).slice(0, 3);
+
+            // Clear the words and definitions containers
+            document.querySelector('.words').innerHTML = '';
+            document.querySelector('.definitions').innerHTML = '';
+
+            // Add words to the HTML
+            randomVerbs.forEach((verb, index) => {
+                const wordBox = document.createElement('div');
+                wordBox.classList.add('box');
+                wordBox.textContent = verb.word;
+                wordBox.id = `word${index + 1}`;
+                wordBox.addEventListener('click', () => {
+                    if (currentPair < 3) {
+                        selectWord(verb.word, wordBox);
+                    }
+                });
+                document.querySelector('.words').appendChild(wordBox);
+            });
+
+            // Shuffle and add definitions to the HTML
+            const shuffledDefs = shuffle([...randomVerbs]);
+            shuffledDefs.forEach((verb, index) => {
+                const defBox = document.createElement('div');
+                defBox.classList.add('box');
+                defBox.textContent = verb.definition;
+                defBox.id = `def${index + 1}`;
+                defBox.addEventListener('click', () => {
+                    if (currentPair < 3) {
+                        selectDefinition(verb.definition, defBox);
+                    }
+                });
+                document.querySelector('.definitions').appendChild(defBox);
+            });
+        }
+
+        // Function to select a word
+        function selectWord(word, wordBox) {
+            if (!selectedWords.includes(word) && !wordBox.classList.contains('disabled')) {
+                wordBox.classList.add(colors[currentPair], 'disabled');
+                selectedWords.push(word);
+            }
+        }
+
+        // Function to select a definition
+        function selectDefinition(definition, defBox) {
+            if (!selectedDefs.includes(definition) && !defBox.classList.contains('disabled')) {
+                defBox.classList.add(colors[currentPair], 'disabled');
+                selectedDefs.push(definition);
+                currentPair++;
+
+                // Automatically move to next pair
+                if (currentPair === 3) {
+                    document.getElementById('result').textContent = "Vous avez sélectionné 3 paires, vérifiez maintenant!";
+                }
+            }
+        }
+
+        // Function to check answers and load new words
+        function checkAnswers() {
+            if (selectedWords.length === 3 && selectedDefs.length === 3) {
+                let correctCount = 0;
+                selectedWords.forEach((word, index) => {
+                    const matchedVerb = verbs.find(verb => verb.word === word && verb.definition === selectedDefs[index]);
+                    if (matchedVerb) {
+                        correctCount++;
+                    }
+                });
+
+                if (correctCount === 3) {
+                    document.getElementById('result').textContent = "Toutes les réponses sont correctes!";
+                    score++;
+                } else {
+                    document.getElementById('result').textContent = `Vous avez ${correctCount} correct(s) sur 3.`;
+                }
+
+                totalQuestions++;
+                updateScore();
+                loadWordsAndDefs(); // Load new words after answering
+            } else {
+                document.getElementById('result').textContent = "Veuillez sélectionner 3 paires de mots et de définitions.";
+            }
+        }
+
+        // Update score
+        function updateScore() {
+            const percentage = Math.round((score / totalQuestions) * 100);
+            document.getElementById('score').textContent = `Score: ${percentage}% (${score}/${totalQuestions})`;
+        }
+
+        // Load the initial set of words and definitions
+        loadWordsAndDefs();
+    </script>
+</body>
+</html>
